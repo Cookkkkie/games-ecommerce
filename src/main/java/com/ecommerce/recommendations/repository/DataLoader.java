@@ -20,11 +20,9 @@ import java.util.*;
 @Component
 public class DataLoader {
 
-    /** raw names + metadata */
     @Value("${steam_names.data.path}")
     private String namesParquetLocation;
 
-    /** cleaned text for vectorizing */
     @Value("${steam.data.path}")
     private String cleanedParquetLocation;
 
@@ -33,18 +31,15 @@ public class DataLoader {
         this.resourceLoader = resourceLoader;
     }
 
-    // exposed for display/look-ups
     @Getter private List<Game> rawGames;
     @Getter private Map<Integer, Integer> rawIndexOfGame;
 
-    // exposed for modeling
     @Getter private List<Game> cleanGames;
     @Getter private Map<Integer, Integer> cleanIndexOfGame;
     @Getter private TfidfVectorizer vectorizer;
 
     @PostConstruct
     public void init() throws IOException {
-        // ─── load raw parquet ────────────────────────────────────────────────────
         rawGames       = new ArrayList<>();
         rawIndexOfGame = new HashMap<>();
         readParquet(
@@ -53,7 +48,6 @@ public class DataLoader {
                 rawIndexOfGame
         );
 
-        // ─── load cleaned parquet ──────────────────────────────────────────────
         cleanGames       = new ArrayList<>();
         cleanIndexOfGame = new HashMap<>();
         readParquet(
@@ -62,7 +56,6 @@ public class DataLoader {
                 cleanIndexOfGame
         );
 
-        // ─── build TF-IDF on the cleaned documents ─────────────────────────────
         vectorizer = new TfidfVectorizer(
                 cleanGames.stream()
                         .map(Game::document)
@@ -70,9 +63,6 @@ public class DataLoader {
         );
     }
 
-    /**
-     * Generic helper: read a parquet @path into the given list & index map.
-     */
     private void readParquet(
             String resourcePath,
             List<Game> targetGames,
@@ -95,25 +85,22 @@ public class DataLoader {
         }
     }
 
-    /** Convert an Avro record into your Game POJO */
     private static Game toGame(GenericRecord r) {
         return Game.builder()
-                .gameId    (Integer.parseInt(r.get("gameId").toString()))
-                .name      (optStr(r, "name"))
-                .about     (optStr(r, "about_the_game"))
-                .categories(optStr(r, "categories"))
-                .genres    (optStr(r, "genres"))
-                .publishers(optStr(r, "publishers"))
-                .price     (optDbl(r, "price"))
+
+
+                .gameId         (Integer.parseInt(r.get("gameId").toString()))
+                .name           (optStr(r, "name"))
+                .price          (optStr(r, "price"))
+                .about          (optStr(r, "about_the_game"))
+                .categories     (optStr(r, "categories"))
+                .genres         (optStr(r, "genres"))
+                .publishers     (optStr(r, "publishers"))
                 .build();
     }
 
     private static String optStr(GenericRecord r, String f) {
         Object o = r.get(f);
         return o == null ? "" : o.toString();
-    }
-    private static double optDbl(GenericRecord r, String f) {
-        Object o = r.get(f);
-        return o == null ? Double.NaN : Double.parseDouble(o.toString());
     }
 }

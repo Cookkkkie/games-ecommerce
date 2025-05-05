@@ -5,12 +5,9 @@ import com.ecommerce.recommendations.repository.DataLoader;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
-import static java.util.Collections.shuffle;
 
 @Service
 public class GameService {
@@ -26,7 +23,7 @@ public class GameService {
         if (random25Games == null) {
             List<Game> copy = new ArrayList<>(loader.getCleanGames());
             Collections.shuffle(copy);
-            random25Games = Collections.unmodifiableList(copy.subList(0, Math.min(25, copy.size())));
+            random25Games = Collections.unmodifiableList(copy.subList(0, Math.min(50, copy.size())));
         }
         return random25Games;
     }
