@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><title>Game Store</title></head>
+<body>
+<h1>Featured Games</h1>
+<div th:each="g : ${games}">
+    <a th:href="@{'/games/' + ${g.gameId}}">
+        <h3 th:text="${g.name}"></h3>
+        <p th:text="${g.genres}"></p>
+    </a>
+</div>
+</body>
+</html>
