@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head><title th:text="${game.name}"></title></head>
+<body>
+<a href="/">Back to home</a>
+<h1 th:text="${game.name}"></h1>
+<p th:text="${game.about}"></p>
+
+<h2>Recommended For You</h2>
+<div th:each="r : ${recs}">
+  <h4 th:text="${r.game.name}"></h4>
+  <p>Score: <span th:text="${r.score}"></span></p>
+  <p>Description: <span th:text="${r.game.about}"></span></p>
+
+  <button th:onclick="|like(${game.gameId}, ${r.game.gameId}, true)|">
+    Like
+  </button>
+</div>
+
+<script>
+  function like(mainId, recId, liked) {
+    fetch(`/games/${mainId}/likes?recId=${recId}&liked=${liked}`, { method: 'POST' });
+  }
+</script>
+</body>
+</html>
